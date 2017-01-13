@@ -16,14 +16,14 @@
 //|   Input parameters                                               |
 //+------------------------------------------------------------------+
 input ENUM_TIMEFRAMES      InpTimeframe=PERIOD_H1;       // Timeframe
-input uint                 InpFastPeriod=12;             // Fast Period 
-input uint                 InpSlowPeriod=26;             // Slow Period 
-input uint                 InpSignalPeriod=9;            // Signal Period 
+input uint                 InpFastPeriod=12;             // Fast Period
+input uint                 InpSlowPeriod=26;             // Slow Period
+input uint                 InpSignalPeriod=9;            // Signal Period
 input ENUM_APPLIED_PRICE   InpAppliedPrice=PRICE_CLOSE;  // Applied Price
 input uint                 InpShift=0;                   // Shift
 input ENUM_OPEN_METHOD     InpOpenMethod=OPEN_METHOD1;   // Open Method
 input uint                 InpOneOfMethods=3;            // One Of Methods, ex: 7 (1 or 2 or 4)
-input uint                 InpSumOfMethods=3;            // Sum Of Methods, ex: 7 (1 and 2 and 
+input uint                 InpSumOfMethods=3;            // Sum Of Methods, ex: 7 (1 and 2 and
 input uint                 InpOpenLevel=0;               // Open Level, pips
 sinput double              InpVolume=0.01;               // Volume
 input uint                 InpTakeProfit=0;              // Take Profit, pips
@@ -133,8 +133,8 @@ void OnTick()
       if(!PositonTotal(pos_count,_Symbol,InpMagicNumber))
          return;
       //---
-      if(last_time.buy_time<Time(_Symbol,InpTimeframe,0) && 
-         ((!InpCloseOpposite && pos_count.sell_count+pos_count.buy_count==0) || 
+      if(last_time.buy_time<Time(_Symbol,InpTimeframe,0) &&
+         ((!InpCloseOpposite && pos_count.sell_count+pos_count.buy_count==0) ||
          (InpCloseOpposite && pos_count.buy_count==0)))
         {
          //---
@@ -161,8 +161,8 @@ void OnTick()
       if(!PositonTotal(pos_count,_Symbol,InpMagicNumber))
          return;
       //---
-      if(last_time.sell_time<Time(_Symbol,InpTimeframe,0) && 
-         ((!InpCloseOpposite && pos_count.sell_count+pos_count.buy_count==0) || 
+      if(last_time.sell_time<Time(_Symbol,InpTimeframe,0) &&
+         ((!InpCloseOpposite && pos_count.sell_count+pos_count.buy_count==0) ||
          (InpCloseOpposite && pos_count.sell_count==0)))
         {
          //---
