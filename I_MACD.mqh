@@ -81,6 +81,13 @@ public:
   }
 
   /**
+   * Get shift value.
+   */
+  uint GetShift() {
+    return MACD_Shift;
+  }
+
+  /**
    * Get applied price value from settings.
    */
   ENUM_APPLIED_PRICE GetAppliedPrice() {
@@ -93,10 +100,8 @@ public:
   bool Update() {
     double _macd_main, _macd_signal;
     #ifdef __MQL4__
-    _ma_value = iMACD(market.GetSymbol(), tf.GetTf(), GetPeriod(MACD_FAST), GetPeriod(MACD_SLOW), GetPeriodSignal, GetAppliedPrice(), MODE_MAIN, GetShift(k));
-    _macd_signal = iMACD(market.GetSymbol(), tf.GetTf(), GetPeriod(MACD_FAST), GetPeriod(MACD_SLOW), GetPeriodSignal, GetAppliedPrice(), MODE_SIGNAL, GetShift(k));
-    NewValue(MODE_MAIN, _macd_main);
-    NewValue(MODE_SIGNAL, _macd_signal);
+    _macd_main = iMACD(market.GetSymbol(), tf.GetTf(), GetPeriod(MACD_FAST), GetPeriod(MACD_SLOW), GetPeriodSignal(), GetAppliedPrice(), MODE_MAIN, GetShift());
+    _macd_signal = iMACD(market.GetSymbol(), tf.GetTf(), GetPeriod(MACD_FAST), GetPeriod(MACD_SLOW), GetPeriodSignal(), GetAppliedPrice(), MODE_SIGNAL, GetShift());
     #else // __MQL5__
     int _handle;
     _handle = iMACD(market.GetSymbol(), tf.GetTf(), GetPeriod(MACD_FAST), GetPeriod(MACD_SLOW), GetPeriodSignal(), GetAppliedPrice());
@@ -110,6 +115,8 @@ public:
       return false;
     }
     #endif
+    NewValue(_macd_main, MODE_MAIN);
+    NewValue(_macd_signal, MODE_SIGNAL);
     return true;
   }
 };
