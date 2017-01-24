@@ -59,7 +59,7 @@ public:
   /**
    * Class constructor.
    */
-  void I_MACD(IndicatorParams &_params, Timeframe *_tf = NULL) : Indicator(_params, _tf) {
+  void I_MACD(IndicatorParams &_params) : Indicator(_params) {
   }
 
   /**
@@ -100,8 +100,8 @@ public:
   bool Update() {
     double _macd_main, _macd_signal;
     #ifdef __MQL4__
-    _macd_main = iMACD(market.GetSymbol(), tf.GetTf(), GetPeriod(MACD_FAST), GetPeriod(MACD_SLOW), GetPeriodSignal(), GetAppliedPrice(), MODE_MAIN, GetShift());
-    _macd_signal = iMACD(market.GetSymbol(), tf.GetTf(), GetPeriod(MACD_FAST), GetPeriod(MACD_SLOW), GetPeriodSignal(), GetAppliedPrice(), MODE_SIGNAL, GetShift());
+    _macd_main = iMACD(GetSymbol(), GetTf(), GetPeriod(MACD_FAST), GetPeriod(MACD_SLOW), GetPeriodSignal(), GetAppliedPrice(), MODE_MAIN, GetShift());
+    _macd_signal = iMACD(GetSymbol(), GetTf(), GetPeriod(MACD_FAST), GetPeriod(MACD_SLOW), GetPeriodSignal(), GetAppliedPrice(), MODE_SIGNAL, GetShift());
     #else // __MQL5__
     int _handle;
     _handle = iMACD(market.GetSymbol(), tf.GetTf(), GetPeriod(MACD_FAST), GetPeriod(MACD_SLOW), GetPeriodSignal(), GetAppliedPrice());

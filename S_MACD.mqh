@@ -41,10 +41,6 @@
 #ifdef __input__ input #endif double MACD_SignalLevel = 1.2;      // Signal level
 #ifdef __input__ input #endif string MACD_Override = "";          // Params to override
 
-// Includes.
-#include <EA31337-classes\Strategy.mqh>
-#include <EA31337-classes\Strategies.mqh>
-
 class S_MACD: public Strategy {
 protected:
 
@@ -53,8 +49,7 @@ public:
   /**
    * Class constructor.
    */
-  S_MACD(string _name, StrategyParams &_params, Market *_market = NULL, Timeframe *_tf = NULL, Log *_log = NULL)
-    : Strategy(_name, _params, _market, _tf, _log)
+  void S_MACD(StrategyParams &_params)
   {
   }
 
@@ -64,9 +59,9 @@ public:
   bool Init() {
     bool initiated = true;
     IndicatorParams indi_params = { S_IND_MA };
-    data = new I_MACD(indi_params, tf);
-    initiated &= data.Update();
-    initiated &= data.GetValue(MODE_MAIN, CURR, (double) TYPE_DOUBLE) > 0;
+    params.data = new I_MACD(indi_params);
+    initiated &= IndicatorInfo().Update();
+    initiated &= IndicatorInfo().GetValue(MODE_MAIN, CURR, (double) TYPE_DOUBLE) > 0;
     return initiated;
   }
 
@@ -81,9 +76,9 @@ public:
    */
   bool Signal(ENUM_ORDER_TYPE _cmd, int _base_method, int _open_method = 0, double _level = 0.0) {
     bool _signal = false;
-    data.Update();
-    _level *= market.GetPipSize();
-    #define _MACD(type, index) data.GetValue(type, index, (double) TYPE_DOUBLE)
+    IndicatorInfo().Update();
+    _level *= MarketInfo().GetPipSize();
+    #define _MACD(type, index) IndicatorInfo().GetValue(type, index, (double) TYPE_DOUBLE)
 
     switch (_cmd) {
       /* TODO:
