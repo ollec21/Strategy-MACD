@@ -104,16 +104,18 @@ public:
     _macd_signal = iMACD(GetSymbol(), GetTf(), GetPeriod(MACD_FAST), GetPeriod(MACD_SLOW), GetPeriodSignal(), GetAppliedPrice(), MODE_SIGNAL, GetShift());
     #else // __MQL5__
     int _handle;
-    _handle = iMACD(market.GetSymbol(), tf.GetTf(), GetPeriod(MACD_FAST), GetPeriod(MACD_SLOW), GetPeriodSignal(), GetAppliedPrice());
-    // @todo
-    if (::CopyBuffer(_handle, 0, 0, 1, _macd_main) < 0) {
+    _handle = iMACD(GetSymbol(), GetTf(), GetPeriod(MACD_FAST), GetPeriod(MACD_SLOW), GetPeriodSignal(), GetAppliedPrice());
+    double _buffer[];
+    if (CopyBuffer(_handle, 0, (int) 0, (int) 1, _buffer) < 0) {
       logger.Error("Error in copying data!", __FUNCTION__ + ": ");
       return false;
     }
-    if (::CopyBuffer(_handle, 1, 0, 1, _macd_signal) < 0) {
+    _macd_main = _buffer[0];
+    if (CopyBuffer(_handle, 1, (int) 0, (int) 1, _buffer) < 0) {
       logger.Error("Error in copying data!", __FUNCTION__ + ": ");
       return false;
     }
+    _macd_signal = _buffer[0];
     #endif
     NewValue(_macd_main, MODE_MAIN);
     NewValue(_macd_signal, MODE_SIGNAL);
