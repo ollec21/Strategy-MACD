@@ -74,7 +74,7 @@ public:
    *   _open_method (int) - open signal method to use by using bitwise AND operation
    *   _level (double) - signal level to consider the signal
    */
-  bool Signal(ENUM_ORDER_TYPE _cmd, int _base_method, int _open_method = 0, double _level = 0.0) {
+  virtual bool Signal(ENUM_ORDER_TYPE _cmd, int _base_method, int _open_method = 0, double _level = 0.0) {
     bool _signal = false;
     IndicatorInfo().Update();
     _level *= MarketInfo().GetPipSize();
@@ -125,6 +125,9 @@ public:
       data.PrintData();
     #endif
     return _signal;
+  }
+  virtual bool Signal(ENUM_ORDER_TYPE _cmd) {
+   return true;
   }
 
 };
