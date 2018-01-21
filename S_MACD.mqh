@@ -58,10 +58,10 @@ public:
    */
   bool Init() {
     bool initiated = true;
-    IndicatorParams indi_params = { S_IND_MA };
+    IndicatorParams indi_params = { INDI_MA };
     params.data = new I_MACD(indi_params);
     initiated &= IndicatorInfo().Update();
-    initiated &= IndicatorInfo().GetValue(MODE_MAIN, CURR, (double) TYPE_DOUBLE) > 0;
+    initiated &= IndicatorInfo().GetValue(LINE_MAIN, CURR, (double) TYPE_DOUBLE) > 0;
     return initiated;
   }
 
@@ -86,35 +86,35 @@ public:
             //VERSION EXISTS, THAT THE SIGNAL TO BUY IS TRUE ONLY IF MACD<0, SIGNAL TO SELL - IF MACD>0
             //Buy: MACD rises above the signal line
             //Sell: MACD falls below the signal line
-            if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_MAIN,1)<iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_SIGNAL,1)
-            && iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_MAIN,0)>=iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_SIGNAL,0))
+            if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,1)<iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_SIGNAL,1)
+            && iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,0)>=iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_SIGNAL,0))
             {f20=1;}
-            if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_MAIN,1)>iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_SIGNAL,1)
-            && iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_MAIN,0)<=iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_SIGNAL,0))
+            if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,1)>iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_SIGNAL,1)
+            && iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,0)<=iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_SIGNAL,0))
             {f20=-1;}
 
             //21. MACD (2)
             //Buy: crossing 0 upwards
             //Sell: crossing 0 downwards
-            if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_MAIN,1)<0&&iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_MAIN,0)>=0)
+            if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,1)<0&&iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,0)>=0)
             {f21=1;}
-            if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_MAIN,1)>0&&iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,MODE_MAIN,0)<=0)
+            if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,1)>0&&iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,0)<=0)
             {f21=-1;}
       */
       case OP_BUY:
-        _signal = _MACD(MODE_MAIN, CURR) > _MACD(MODE_SIGNAL, CURR) + _level; // MACD rises above the signal line.
-        if ((_open_method & OPEN_METHOD1) != 0) _signal &= _MACD(MODE_MAIN, FAR) < _MACD(MODE_SIGNAL, FAR);
-        if ((_open_method & OPEN_METHOD2) != 0) _signal &= _MACD(MODE_MAIN, CURR) >= 0;
-        if ((_open_method & OPEN_METHOD3) != 0) _signal &= _MACD(MODE_MAIN, PREV) < 0;
+        _signal = _MACD(LINE_MAIN, CURR) > _MACD(LINE_SIGNAL, CURR) + _level; // MACD rises above the signal line.
+        if ((_open_method & OPEN_METHOD1) != 0) _signal &= _MACD(LINE_MAIN, FAR) < _MACD(LINE_SIGNAL, FAR);
+        if ((_open_method & OPEN_METHOD2) != 0) _signal &= _MACD(LINE_MAIN, CURR) >= 0;
+        if ((_open_method & OPEN_METHOD3) != 0) _signal &= _MACD(LINE_MAIN, PREV) < 0;
         // @todo
         // if ((_open_method & OPEN_METHOD4) != 0) _signal &= ma_fast[period, CURR) > ma_fast[period, PREV);
         // if ((_open_method & OPEN_METHOD5) != 0) _signal &= ma_fast[period, CURR) > ma_medium[period, CURR);
         break;
       case OP_SELL:
-        _signal = _MACD(MODE_MAIN, CURR) < _MACD(MODE_SIGNAL, CURR) - _level; // MACD falls below the signal line.
-        if ((_open_method & OPEN_METHOD1) != 0) _signal &= _MACD(MODE_MAIN, FAR) > _MACD(MODE_SIGNAL, FAR);
-        if ((_open_method & OPEN_METHOD2) != 0) _signal &= _MACD(MODE_MAIN, CURR) <= 0;
-        if ((_open_method & OPEN_METHOD3) != 0) _signal &= _MACD(MODE_MAIN, PREV) > 0;
+        _signal = _MACD(LINE_MAIN, CURR) < _MACD(LINE_SIGNAL, CURR) - _level; // MACD falls below the signal line.
+        if ((_open_method & OPEN_METHOD1) != 0) _signal &= _MACD(LINE_MAIN, FAR) > _MACD(LINE_SIGNAL, FAR);
+        if ((_open_method & OPEN_METHOD2) != 0) _signal &= _MACD(LINE_MAIN, CURR) <= 0;
+        if ((_open_method & OPEN_METHOD3) != 0) _signal &= _MACD(LINE_MAIN, PREV) > 0;
         // @todo
         // if ((_open_method & OPEN_METHOD4) != 0) _signal &= ma_fast[period][CURR] < ma_fast[period][PREV];
         // if ((_open_method & OPEN_METHOD5) != 0) _signal &= ma_fast[period][CURR] < ma_medium[period][CURR];

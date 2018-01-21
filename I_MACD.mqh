@@ -134,10 +134,11 @@ protected:
      * Calculates the Moving Average indicator.
      */
     bool Update() {
-      double _macd_main = iMACD(GetSymbol(), GetTf(), GetPeriod(MACD_FAST), GetPeriod(MACD_SLOW), GetPeriodSignal(), GetAppliedPrice(), MODE_MAIN, GetShift());
-      double _macd_signal = iMACD(GetSymbol(), GetTf(), GetPeriod(MACD_FAST), GetPeriod(MACD_SLOW), GetPeriodSignal(), GetAppliedPrice(), MODE_SIGNAL, GetShift());
-      Add(_macd_main, MODE_MAIN);
-      Add(_macd_signal, MODE_SIGNAL);
-      return true;
+      bool _res = true;
+      double _macd_main = iMACD(GetSymbol(), GetTf(), GetPeriod(MACD_FAST), GetPeriod(MACD_SLOW), GetPeriodSignal(), GetAppliedPrice(), LINE_MAIN, GetShift());
+      double _macd_signal = iMACD(GetSymbol(), GetTf(), GetPeriod(MACD_FAST), GetPeriod(MACD_SLOW), GetPeriodSignal(), GetAppliedPrice(), LINE_SIGNAL, GetShift());
+      _res |= Add(_macd_main, LINE_MAIN);
+      _res |= Add(_macd_signal, LINE_SIGNAL);
+      return _res;
     }
 };
