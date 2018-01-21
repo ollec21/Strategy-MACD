@@ -62,43 +62,6 @@ protected:
     }
 
     /**
-     * Returns the indicator value.
-     *
-     * @docs
-     * - https://docs.mql4.com/indicators/imacd
-     * - https://www.mql5.com/en/docs/indicators/imacd
-     */
-    static double iMACD(
-        string _symbol,
-        ENUM_TIMEFRAMES _tf,
-        uint _fast_ema_period,
-        uint _slow_ema_period,
-        uint _signal_period,
-        ENUM_APPLIED_PRICE _applied_price,  // (MT4/MT5): PRICE_CLOSE, PRICE_OPEN, PRICE_HIGH, PRICE_LOW, PRICE_MEDIAN, PRICE_TYPICAL, PRICE_WEIGHTED
-        int _mode,                          // (MT4 _mode): 0 - MODE_MAIN, 1 - MODE_SIGNAL
-        int _shift = 0                      // (MT5 _mode); 0 - MAIN_LINE, 1 - SIGNAL_LINE
-        ) {
-      #ifdef __MQL4__
-      return ::iMACD(_symbol, _tf, _fast_ema_period, _slow_ema_period, _signal_period, _applied_price, _mode, _shift);
-      #else // __MQL5__
-      double _res[];
-      int _handle = ::iMACD(_symbol, _tf, _fast_ema_period, _slow_ema_period, _signal_period, _applied_price);
-      return CopyBuffer(_handle, _mode, _shift, 1, _res) > 0 ? _res[0] : EMPTY_VALUE;
-      #endif
-    }
-    double iMACD(
-        uint _fast_ema_period,
-        uint _slow_ema_period,
-        uint _signal_period,
-        ENUM_APPLIED_PRICE _applied_price,
-        int _mode,
-        int _shift = 0) {
-      double _value = iMACD(GetSymbol(), GetTf(), _fast_ema_period, _slow_ema_period, _signal_period, _applied_price, _mode, _shift);
-      CheckLastError();
-      return _value;
-    }
-
-    /**
      * Get period value from settings.
      */
     uint GetPeriod(ENUM_MACD _macd_type) {
@@ -135,8 +98,8 @@ protected:
      */
     bool Update() {
       bool _res = true;
-      double _macd_main = iMACD(GetSymbol(), GetTf(), GetPeriod(MACD_FAST), GetPeriod(MACD_SLOW), GetPeriodSignal(), GetAppliedPrice(), LINE_MAIN, GetShift());
-      double _macd_signal = iMACD(GetSymbol(), GetTf(), GetPeriod(MACD_FAST), GetPeriod(MACD_SLOW), GetPeriodSignal(), GetAppliedPrice(), LINE_SIGNAL, GetShift());
+      double _macd_main = Indicators::iMACD(GetSymbol(), GetTf(), GetPeriod(MACD_FAST), GetPeriod(MACD_SLOW), GetPeriodSignal(), GetAppliedPrice(), LINE_MAIN, GetShift());
+      double _macd_signal = Indicators::iMACD(GetSymbol(), GetTf(), GetPeriod(MACD_FAST), GetPeriod(MACD_SLOW), GetPeriodSignal(), GetAppliedPrice(), LINE_SIGNAL, GetShift());
       _res |= Add(_macd_main, LINE_MAIN);
       _res |= Add(_macd_signal, LINE_SIGNAL);
       return _res;
