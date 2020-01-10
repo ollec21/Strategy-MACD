@@ -6,17 +6,16 @@
 
 /**
  * @file
- * Implements MACD strategy.
+ * Implements MACD strategy based on the Moving Averages Convergence/Divergence indicator.
  */
 
 // Includes.
-#include "../../EA31337-classes/Indicators/Indi_MACD.mqh"
-#include "../../EA31337-classes/Strategy.mqh"
+#include <EA31337-classes/Indicators/Indi_MACD.mqh>
+#include <EA31337-classes/Strategy.mqh>
 
 // User input params.
-INPUT string __MACD_Parameters__ =
-    "-- Settings for the Moving Averages Convergence/Divergence indicator --";  // >>> MACD <<<
-INPUT uint MACD_Active_Tf = 0;      // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
+INPUT string __MACD_Parameters__ = "-- MACD strategy params --";  // >>> MACD <<<
+INPUT int MACD_Active_Tf = 0;       // Activate timeframes (1-255, e.g. M1=1,M5=2,M15=4,M30=8,H1=16,H2=32...)
 INPUT int MACD_Period_Fast = 23;    // Period Fast
 INPUT int MACD_Period_Slow = 21;    // Period Slow
 INPUT int MACD_Period_Signal = 10;  // Period for signal
@@ -24,97 +23,102 @@ INPUT ENUM_APPLIED_PRICE MACD_Applied_Price = PRICE_CLOSE;  // Applied Price
 INPUT int MACD_Shift = 3;                                   // Shift
 INPUT ENUM_TRAIL_TYPE MACD_TrailingStopMethod = -1;         // Trail stop method
 INPUT ENUM_TRAIL_TYPE MACD_TrailingProfitMethod = -19;      // Trail profit method
-INPUT double MACD_SignalLevel = 0.1;                        // Signal level
-INPUT int MACD1_SignalMethod = -26;                         // Signal method for M1 (-31-31)
-INPUT int MACD5_SignalMethod = -31;                         // Signal method for M5 (-31-31)
-INPUT int MACD15_SignalMethod = -25;                        // Signal method for M15 (-31-31)
-INPUT int MACD30_SignalMethod = 4;                          // Signal method for M30 (-31-31)
-INPUT int MACD1_OpenCondition1 = 874;                       // Open condition 1 for M1 (0-1023)
-INPUT int MACD1_OpenCondition2 = 0;                         // Open condition 2 for M1 (0-1023)
+INPUT double MACD_SignalOpenLevel = 0.1;                    // Signal open level
+INPUT int MACD1_SignalBaseMethod = -26;                     // Signal base method (-31-31)
+INPUT int MACD1_OpenCondition1 = 874;                       // Open condition 1 (0-1023)
+INPUT int MACD1_OpenCondition2 = 0;                         // Open condition 2 (0-1023)
 INPUT ENUM_MARKET_EVENT MACD1_CloseCondition = 1;           // Close condition for M1
-INPUT int MACD5_OpenCondition1 = 680;                       // Open condition 1 for M5 (0-1023)
-INPUT int MACD5_OpenCondition2 = 0;                         // Open condition 2 for M5 (0-1023)
-INPUT ENUM_MARKET_EVENT MACD5_CloseCondition = 1;           // Close condition for M5
-INPUT int MACD15_OpenCondition1 = 486;                      // Open condition 1 for M15 (0-1023)
-INPUT int MACD15_OpenCondition2 = 0;                        // Open condition 2 for M15 (0-1023)
-INPUT ENUM_MARKET_EVENT MACD15_CloseCondition = 1;          // Close condition for M15
-INPUT int MACD30_OpenCondition1 = 777;                      // Open condition 1 for M30 (0-1023)
-INPUT int MACD30_OpenCondition2 = 0;                        // Open condition 2 for M30 (0-1023)
-INPUT ENUM_MARKET_EVENT MACD30_CloseCondition = 1;          // Close condition for M30
-INPUT double MACD1_MaxSpread = 6.0;                         // Max spread to trade for M1 (pips)
-INPUT double MACD5_MaxSpread = 7.0;                         // Max spread to trade for M5 (pips)
-INPUT double MACD15_MaxSpread = 8.0;                        // Max spread to trade for M15 (pips)
-INPUT double MACD30_MaxSpread = 10.0;                       // Max spread to trade for M30 (pips)
+INPUT double MACD_MaxSpread = 6.0;                          // Max spread to trade (pips)
+
+// Struct to define strategy parameters to override.
+struct Stg_MACD_Params : Stg_Params {
+  unsigned int MACD_Period;
+  ENUM_APPLIED_PRICE MACD_Applied_Price;
+  int MACD_Shift;
+  ENUM_TRAIL_TYPE MACD_TrailingStopMethod;
+  ENUM_TRAIL_TYPE MACD_TrailingProfitMethod;
+  double MACD_SignalOpenLevel;
+  long MACD_SignalBaseMethod;
+  long MACD_SignalOpenMethod1;
+  long MACD_SignalOpenMethod2;
+  double MACD_SignalCloseLevel;
+  ENUM_MARKET_EVENT MACD_SignalCloseMethod1;
+  ENUM_MARKET_EVENT MACD_SignalCloseMethod2;
+  double MACD_MaxSpread;
+
+  // Constructor: Set default param values.
+  Stg_MACD_Params()
+      : MACD_Period(::MACD_Period),
+        MACD_Applied_Price(::MACD_Applied_Price),
+        MACD_Shift(::MACD_Shift),
+        MACD_TrailingStopMethod(::MACD_TrailingStopMethod),
+        MACD_TrailingProfitMethod(::MACD_TrailingProfitMethod),
+        MACD_SignalOpenLevel(::MACD_SignalOpenLevel),
+        MACD_SignalBaseMethod(::MACD_SignalBaseMethod),
+        MACD_SignalOpenMethod1(::MACD_SignalOpenMethod1),
+        MACD_SignalOpenMethod2(::MACD_SignalOpenMethod2),
+        MACD_SignalCloseLevel(::MACD_SignalCloseLevel),
+        MACD_SignalCloseMethod1(::MACD_SignalCloseMethod1),
+        MACD_SignalCloseMethod2(::MACD_SignalCloseMethod2),
+        MACD_MaxSpread(::MACD_MaxSpread) {}
+};
+
+// Loads pair specific param values.
+#include "sets/EURUSD_H1.h"
+#include "sets/EURUSD_H4.h"
+#include "sets/EURUSD_M1.h"
+#include "sets/EURUSD_M15.h"
+#include "sets/EURUSD_M30.h"
+#include "sets/EURUSD_M5.h"
 
 class Stg_MACD : public Strategy {
  public:
   Stg_MACD(StgParams &_params, string _name) : Strategy(_params, _name) {}
 
-  static Stg_MACD *Init_M1() {
-    ChartParams cparams1(PERIOD_M1);
-    IndicatorParams macd_iparams(10, INDI_MACD);
-    MACD_Params macd1_iparams(MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price);
-    StgParams macd1_sparams(new Trade(PERIOD_M1, _Symbol), new Indi_MACD(macd1_iparams, macd_iparams, cparams1), NULL,
-                            NULL);
-    macd1_sparams.SetSignals(MACD1_SignalMethod, MACD1_OpenCondition1, MACD1_OpenCondition2, MACD1_CloseCondition, NULL,
-                             MACD_SignalLevel, NULL);
-    macd1_sparams.SetStops(MACD_TrailingProfitMethod, MACD_TrailingStopMethod);
-    macd1_sparams.SetMaxSpread(MACD1_MaxSpread);
-    macd1_sparams.SetId(MACD1);
-    return (new Stg_MACD(macd1_sparams, "MACD1"));
-  }
-  static Stg_MACD *Init_M5() {
-    ChartParams cparams5(PERIOD_M5);
-    IndicatorParams macd_iparams(10, INDI_MACD);
-    MACD_Params macd5_iparams(MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price);
-    StgParams macd5_sparams(new Trade(PERIOD_M5, _Symbol), new Indi_MACD(macd5_iparams, macd_iparams, cparams5), NULL,
-                            NULL);
-    macd5_sparams.SetSignals(MACD5_SignalMethod, MACD5_OpenCondition1, MACD5_OpenCondition2, MACD5_CloseCondition, NULL,
-                             MACD_SignalLevel, NULL);
-    macd5_sparams.SetStops(MACD_TrailingProfitMethod, MACD_TrailingStopMethod);
-    macd5_sparams.SetMaxSpread(MACD5_MaxSpread);
-    macd5_sparams.SetId(MACD5);
-    return (new Stg_MACD(macd5_sparams, "MACD5"));
-  }
-  static Stg_MACD *Init_M15() {
-    ChartParams cparams15(PERIOD_M15);
-    IndicatorParams macd_iparams(10, INDI_MACD);
-    MACD_Params macd15_iparams(MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price);
-    StgParams macd15_sparams(new Trade(PERIOD_M15, _Symbol), new Indi_MACD(macd15_iparams, macd_iparams, cparams15),
-                             NULL, NULL);
-    macd15_sparams.SetSignals(MACD15_SignalMethod, MACD15_OpenCondition1, MACD15_OpenCondition2, MACD15_CloseCondition,
-                              NULL, MACD_SignalLevel, NULL);
-    macd15_sparams.SetStops(MACD_TrailingProfitMethod, MACD_TrailingStopMethod);
-    macd15_sparams.SetMaxSpread(MACD15_MaxSpread);
-    macd15_sparams.SetId(MACD15);
-    return (new Stg_MACD(macd15_sparams, "MACD15"));
-  }
-  static Stg_MACD *Init_M30() {
-    ChartParams cparams30(PERIOD_M30);
-    IndicatorParams macd_iparams(10, INDI_MACD);
-    MACD_Params macd30_iparams(MACD_Period_Fast, MACD_Period_Slow, MACD_Period_Signal, MACD_Applied_Price);
-    StgParams macd30_sparams(new Trade(PERIOD_M30, _Symbol), new Indi_MACD(macd30_iparams, macd_iparams, cparams30),
-                             NULL, NULL);
-    macd30_sparams.SetSignals(MACD30_SignalMethod, MACD30_OpenCondition1, MACD30_OpenCondition2, MACD30_CloseCondition,
-                              NULL, MACD_SignalLevel, NULL);
-    macd30_sparams.SetStops(MACD_TrailingProfitMethod, MACD_TrailingStopMethod);
-    macd30_sparams.SetMaxSpread(MACD30_MaxSpread);
-    macd30_sparams.SetId(MACD30);
-    return (new Stg_MACD(macd30_sparams, "MACD30"));
-  }
-  static Stg_MACD *Init(ENUM_TIMEFRAMES _tf) {
+  static Stg_MACD *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
+    // Initialize strategy initial values.
+    Stg_MACD_Params _params;
     switch (_tf) {
-      case PERIOD_M1:
-        return Init_M1();
-      case PERIOD_M5:
-        return Init_M5();
-      case PERIOD_M15:
-        return Init_M15();
-      case PERIOD_M30:
-        return Init_M30();
-      default:
-        return NULL;
+      case PERIOD_M1: {
+        Stg_MACD_EURUSD_M1_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M5: {
+        Stg_MACD_EURUSD_M5_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M15: {
+        Stg_MACD_EURUSD_M15_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_M30: {
+        Stg_MACD_EURUSD_M30_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_H1: {
+        Stg_MACD_EURUSD_H1_Params _new_params;
+        _params = _new_params;
+      }
+      case PERIOD_H4: {
+        Stg_MACD_EURUSD_H4_Params _new_params;
+        _params = _new_params;
+      }
     }
+    // Initialize strategy parameters.
+    ChartParams cparams(_tf);
+    MACD_Params adx_params(_params.MACD_Period, _params.MACD_Applied_Price);
+    IndicatorParams adx_iparams(10, INDI_MACD);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_MACD(adx_params, adx_iparams, cparams), NULL, NULL);
+    sparams.logger.SetLevel(_log_level);
+    sparams.SetMagicNo(_magic_no);
+    sparams.SetSignals(_params.MACD_SignalBaseMethod, _params.MACD_SignalOpenMethod1, _params.MACD_SignalOpenMethod2,
+                       _params.MACD_SignalCloseMethod1, _params.MACD_SignalCloseMethod2, _params.MACD_SignalOpenLevel,
+                       _params.MACD_SignalCloseLevel);
+    sparams.SetStops(_params.MACD_TrailingProfitMethod, _params.MACD_TrailingStopMethod);
+    sparams.SetMaxSpread(_params.MACD_MaxSpread);
+    // Initialize strategy instance.
+    Strategy *_strat = new Stg_MACD(sparams, "MACD");
+    return _strat;
   }
 
   /**
@@ -187,5 +191,13 @@ class Stg_MACD : public Strategy {
         break;
     }
     return _result;
+  }
+
+  /**
+   * Check strategy's closing signal.
+   */
+  bool SignalClose(ENUM_ORDER_TYPE _cmd, long _signal_method = EMPTY, double _signal_level = EMPTY) {
+    if (_signal_level == EMPTY) _signal_level = GetSignalCloseLevel();
+    return SignalOpen(Order::NegateOrderType(_cmd), _signal_method, _signal_level);
   }
 };
