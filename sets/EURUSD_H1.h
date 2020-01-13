@@ -12,15 +12,12 @@ struct Stg_MACD_EURUSD_H1_Params : Stg_MACD_Params {
     MACD_Period = 2;
     MACD_Applied_Price = 3;
     MACD_Shift = 0;
-    MACD_TrailingStopMethod = 6;
-    MACD_TrailingProfitMethod = 11;
+    MACD_SignalOpenMethod = 0;
     MACD_SignalOpenLevel = 36;
-    MACD_SignalBaseMethod = 0;
-    MACD_SignalOpenMethod1 = 195;
-    MACD_SignalOpenMethod2 = 0;
+    MACD_SignalCloseMethod = 1;
     MACD_SignalCloseLevel = 36;
-    MACD_SignalCloseMethod1 = 1;
-    MACD_SignalCloseMethod2 = 0;
+    MACD_PriceLimitMethod = 0;
+    MACD_PriceLimitLevel = 0;
     MACD_MaxSpread = 6;
   }
 };
