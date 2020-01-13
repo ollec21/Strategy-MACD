@@ -9,7 +9,9 @@ struct Stg_MACD_EURUSD_H4_Params : Stg_MACD_Params {
   Stg_MACD_EURUSD_H4_Params() {
     symbol = "EURUSD";
     tf = PERIOD_H4;
-    MACD_Period = 2;
+    MACD_Period_Fast = 12;
+    MACD_Period_Slow = 26;
+    MACD_Period_Signal = 9;
     MACD_Applied_Price = 3;
     MACD_Shift = 0;
     MACD_SignalOpenMethod = 0;

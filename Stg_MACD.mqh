@@ -30,10 +30,12 @@ INPUT double MACD_MaxSpread = 6.0;                                // Max spread 
 
 // Struct to define strategy parameters to override.
 struct Stg_MACD_Params : Stg_Params {
-  unsigned int MACD_Period;
+  int MACD_Period_Fast;
+  int MACD_Period_Slow;
+  int MACD_Period_Signal;
   ENUM_APPLIED_PRICE MACD_Applied_Price;
   int MACD_Shift;
-  long MACD_SignalOpenMethod;
+  int MACD_SignalOpenMethod;
   double MACD_SignalOpenLevel;
   int MACD_SignalCloseMethod;
   double MACD_SignalCloseLevel;
@@ -43,7 +45,9 @@ struct Stg_MACD_Params : Stg_Params {
 
   // Constructor: Set default param values.
   Stg_MACD_Params()
-      : MACD_Period(::MACD_Period),
+      : MACD_Period_Fast(::MACD_Period_Fast),
+        MACD_Period_Slow(::MACD_Period_Slow),
+        MACD_Period_Signal(::MACD_Period_Signal),
         MACD_Applied_Price(::MACD_Applied_Price),
         MACD_Shift(::MACD_Shift),
         MACD_SignalOpenMethod(::MACD_SignalOpenMethod),
@@ -98,9 +102,10 @@ class Stg_MACD : public Strategy {
     }
     // Initialize strategy parameters.
     ChartParams cparams(_tf);
-    MACD_Params adx_params(_params.MACD_Period, _params.MACD_Applied_Price);
-    IndicatorParams adx_iparams(10, INDI_MACD);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_MACD(adx_params, adx_iparams, cparams), NULL, NULL);
+    MACD_Params macd_params(_params.MACD_Period_Fast, _params.MACD_Period_Slow, _params.MACD_Period_Signal,
+                            _params.MACD_Applied_Price);
+    IndicatorParams macd_iparams(10, INDI_MACD);
+    StgParams sparams(new Trade(_tf, _Symbol), new Indi_MACD(macd_params, macd_iparams, cparams), NULL, NULL);
     sparams.logger.SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.MACD_SignalOpenMethod, _params.MACD_SignalOpenLevel, _params.MACD_SignalCloseMethod,
@@ -112,13 +117,7 @@ class Stg_MACD : public Strategy {
   }
 
   /**
-   * Check if MACD indicator is on buy.
-   *
-   * @param
-   *   _cmd (int) - type of trade order command
-   *   period (int) - period to check for
-   *   _method (int) - signal method to use by using bitwise AND operation
-   *   _level1 (double) - signal level to consider the signal
+   * Check strategy's opening signal.
    */
   bool SignalOpen(ENUM_ORDER_TYPE _cmd, int _method = 0, double _level = 0.0) {
     bool _result = false;
@@ -128,9 +127,7 @@ class Stg_MACD : public Strategy {
     double macd_1_signal = ((Indi_MACD *)this.Data()).GetValue(LINE_SIGNAL, 1);
     double macd_2_main = ((Indi_MACD *)this.Data()).GetValue(LINE_MAIN, 2);
     double macd_2_signal = ((Indi_MACD *)this.Data()).GetValue(LINE_SIGNAL, 2);
-    if (_level1 == EMPTY) _level1 = GetSignalLevel1();
-    if (_level2 == EMPTY) _level2 = GetSignalLevel2();
-    double gap = _level1 * pip_size;
+    double gap = _level * Market().GetPipSize();
     switch (_cmd) {
       /* TODO:
             //20. MACD (1)
@@ -160,10 +157,12 @@ class Stg_MACD : public Strategy {
           if (METHOD(_method, 0)) _result &= macd_2_main < macd_2_signal;
           if (METHOD(_method, 1)) _result &= macd_0_main >= 0;
           if (METHOD(_method, 2)) _result &= macd_1_main < 0;
+          /*
           if (METHOD(_method, 3))
             _result &= ma_fast[this.Chart().TfToIndex()][CURR] > ma_fast[this.Chart().TfToIndex()][PREV];
           if (METHOD(_method, 4))
             _result &= ma_fast[this.Chart().TfToIndex()][CURR] > ma_medium[this.Chart().TfToIndex()][CURR];
+          */
         }
         break;
       case ORDER_TYPE_SELL:
@@ -172,10 +171,12 @@ class Stg_MACD : public Strategy {
           if (METHOD(_method, 0)) _result &= macd_2_main > macd_2_signal;
           if (METHOD(_method, 1)) _result &= macd_0_main <= 0;
           if (METHOD(_method, 2)) _result &= macd_1_main > 0;
+          /*
           if (METHOD(_method, 3))
             _result &= ma_fast[this.Chart().TfToIndex()][CURR] < ma_fast[this.Chart().TfToIndex()][PREV];
           if (METHOD(_method, 4))
             _result &= ma_fast[this.Chart().TfToIndex()][CURR] < ma_medium[this.Chart().TfToIndex()][CURR];
+          */
         }
         break;
     }
