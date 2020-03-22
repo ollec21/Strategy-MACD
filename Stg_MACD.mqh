@@ -104,65 +104,31 @@ class Stg_MACD : public Strategy {
    * Check strategy's opening signal.
    */
   bool SignalOpen(ENUM_ORDER_TYPE _cmd, int _method = 0, double _level = 0.0) {
-    bool _result = false;
-    double macd_0_main = ((Indi_MACD *)this.Data()).GetValue(LINE_MAIN, 0);
-    double macd_0_signal = ((Indi_MACD *)this.Data()).GetValue(LINE_SIGNAL, 0);
-    double macd_1_main = ((Indi_MACD *)this.Data()).GetValue(LINE_MAIN, 1);
-    double macd_1_signal = ((Indi_MACD *)this.Data()).GetValue(LINE_SIGNAL, 1);
-    double macd_2_main = ((Indi_MACD *)this.Data()).GetValue(LINE_MAIN, 2);
-    double macd_2_signal = ((Indi_MACD *)this.Data()).GetValue(LINE_SIGNAL, 2);
-    double gap = _level * Market().GetPipSize();
-    switch (_cmd) {
-      /* TODO:
-            //20. MACD (1)
-            //VEMACDON EXISTS, THAT THE SIGNAL TO BUY IS TRUE ONLY IF MACD<0, SIGNAL TO SELL - IF MACD>0
-            //Buy: MACD rises above the signal line
-            //Sell: MACD falls below the signal line
-            if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,1)<iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_SIGNAL,1)
-            &&
-         iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,0)>=iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_SIGNAL,0))
-            {f20=1;}
-            if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,1)>iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_SIGNAL,1)
-            &&
-         iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,0)<=iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_SIGNAL,0))
-            {f20=-1;}
-
-            //21. MACD (2)
-            //Buy: crossing 0 upwards
-            //Sell: crossing 0 downwards
-            if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,1)<0&&iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,0)>=0)
-            {f21=1;}
-            if(iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,1)>0&&iMACD(NULL,pimacd,fastpimacd,slowpimacd,signalpimacd,PRICE_CLOSE,LINE_MAIN,0)<=0)
-            {f21=-1;}
-      */
-      case ORDER_TYPE_BUY:
-        _result = macd_0_main > macd_0_signal + gap;  // MACD rises above the signal line.
-        if (_method != 0) {
-          if (METHOD(_method, 0)) _result &= macd_2_main < macd_2_signal;
-          if (METHOD(_method, 1)) _result &= macd_0_main >= 0;
-          if (METHOD(_method, 2)) _result &= macd_1_main < 0;
-          /*
-          if (METHOD(_method, 3))
-            _result &= ma_fast[this.Chart().TfToIndex()][CURR] > ma_fast[this.Chart().TfToIndex()][PREV];
-          if (METHOD(_method, 4))
-            _result &= ma_fast[this.Chart().TfToIndex()][CURR] > ma_medium[this.Chart().TfToIndex()][CURR];
-          */
-        }
-        break;
-      case ORDER_TYPE_SELL:
-        _result = macd_0_main < macd_0_signal - gap;  // MACD falls below the signal line.
-        if (_method != 0) {
-          if (METHOD(_method, 0)) _result &= macd_2_main > macd_2_signal;
-          if (METHOD(_method, 1)) _result &= macd_0_main <= 0;
-          if (METHOD(_method, 2)) _result &= macd_1_main > 0;
-          /*
-          if (METHOD(_method, 3))
-            _result &= ma_fast[this.Chart().TfToIndex()][CURR] < ma_fast[this.Chart().TfToIndex()][PREV];
-          if (METHOD(_method, 4))
-            _result &= ma_fast[this.Chart().TfToIndex()][CURR] < ma_medium[this.Chart().TfToIndex()][CURR];
-          */
-        }
-        break;
+    Indicator *_indi = Data();
+    bool _is_valid = _indi[CURR].IsValid() && _indi[PREV].IsValid() && _indi[PPREV].IsValid();
+    bool _result = _is_valid;
+    double _level_pips = _level * Chart().GetPipSize();
+    if (_is_valid) {
+      switch (_cmd) {
+        case ORDER_TYPE_BUY:
+          // Buy: MACD rises above the signal line.
+          _result = _indi[PPREV].value[LINE_MAIN] < 0 && _indi[CURR].value[LINE_MAIN] > _indi[CURR].value[LINE_SIGNAL] + _level_pips;  // MACD rises above the signal line.
+          if (_method != 0) {
+            if (METHOD(_method, 0)) _result &= _indi[PPREV].value[LINE_MAIN] < _indi[PPREV].value[LINE_SIGNAL];
+            // Buy: crossing 0 upwards.
+            if (METHOD(_method, 1)) _result &= _indi[CURR].value[LINE_MAIN] > 0;
+          }
+          break;
+        case ORDER_TYPE_SELL:
+          // Sell: MACD falls below the signal line.
+          _result = _indi[PPREV].value[LINE_MAIN] > 0 && _indi[CURR].value[LINE_MAIN] > _indi[CURR].value[LINE_SIGNAL] - _level_pips;  // MACD falls below the signal line.
+          if (_method != 0) {
+            if (METHOD(_method, 0)) _result &= _indi[PPREV].value[LINE_MAIN] > _indi[PPREV].value[LINE_SIGNAL];
+            // Sell: crossing 0 downwards.
+            if (METHOD(_method, 1)) _result &= _indi[CURR].value[LINE_MAIN] < 0;
+          }
+          break;
+      }
     }
     return _result;
   }
@@ -210,14 +176,23 @@ class Stg_MACD : public Strategy {
    * Gets price limit value for profit take or stop loss.
    */
   double PriceLimit(ENUM_ORDER_TYPE _cmd, ENUM_ORDER_TYPE_VALUE _mode, int _method = 0, double _level = 0.0) {
+    Indicator *_indi = Data();
+    bool _is_valid = _indi[CURR].IsValid() && _indi[PREV].IsValid() && _indi[PPREV].IsValid();
     double _trail = _level * Market().GetPipSize();
-    int _direction = Order::OrderDirection(_cmd) * (_mode == ORDER_TYPE_SL ? -1 : 1);
+    int _direction = Order::OrderDirection(_cmd, _mode);
     double _default_value = Market().GetCloseOffer(_cmd) + _trail * _method * _direction;
     double _result = _default_value;
-    switch (_method) {
-      case 0: {
-        // @todo
+    if (_is_valid) {
+      switch (_method) {
+        case 0:
+          // @todo
+          //_result = _indi.GetHighest()
+          break;
+        case 1:
+          _result = (_direction > 0 ? fmax(_indi[PPREV].value[LINE_MAIN], _indi[PPREV].value[LINE_SIGNAL]) : fmin(_indi[PPREV].value[LINE_MAIN], _indi[PPREV].value[LINE_SIGNAL]));
+          break;
       }
+      _result += _trail * _direction;
     }
     return _result;
   }
