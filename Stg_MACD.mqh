@@ -94,6 +94,7 @@ class Stg_MACD : public Strategy {
     sparams.SetSignals(_params.MACD_SignalOpenMethod, _params.MACD_SignalOpenLevel, _params.MACD_SignalCloseMethod,
                        _params.MACD_SignalOpenFilterMethod, _params.MACD_SignalOpenBoostMethod,
                        _params.MACD_SignalCloseLevel);
+    sparams.SetPriceLimits(_params.MACD_PriceLimitMethod, _params.MACD_PriceLimitLevel);
     sparams.SetMaxSpread(_params.MACD_MaxSpread);
     // Initialize strategy instance.
     Strategy *_strat = new Stg_MACD(sparams, "MACD");
