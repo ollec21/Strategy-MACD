@@ -89,7 +89,7 @@ class Stg_MACD : public Strategy {
                             _params.MACD_Applied_Price);
     macd_params.SetTf(_tf);
     StgParams sparams(new Trade(_tf, _Symbol), new Indi_MACD(macd_params), NULL, NULL);
-    sparams.logger.SetLevel(_log_level);
+    sparams.logger.Ptr().SetLevel(_log_level);
     sparams.SetMagicNo(_magic_no);
     sparams.SetSignals(_params.MACD_SignalOpenMethod, _params.MACD_SignalOpenLevel, _params.MACD_SignalCloseMethod,
                        _params.MACD_SignalOpenFilterMethod, _params.MACD_SignalOpenBoostMethod,
