@@ -10,14 +10,14 @@ INPUT int MACD_Period_Signal = 10;                          // Period for signal
 INPUT ENUM_APPLIED_PRICE MACD_Applied_Price = PRICE_CLOSE;  // Applied Price
 INPUT int MACD_Shift = 3;                                   // Shift
 INPUT int MACD_SignalOpenMethod = -26;                      // Signal open method (-31-31)
-INPUT float MACD_SignalOpenLevel = 0.1;                    // Signal open level
+INPUT float MACD_SignalOpenLevel = 0.1f;                    // Signal open level
 INPUT int MACD_SignalOpenFilterMethod = 0;                  // Signal open filter method
 INPUT int MACD_SignalOpenBoostMethod = 0;                   // Signal open boost method
 INPUT int MACD_SignalCloseMethod = -26;                     // Signal close method (-31-31)
-INPUT float MACD_SignalCloseLevel = 0.1;                   // Signal close level
+INPUT float MACD_SignalCloseLevel = 0.1f;                   // Signal close level
 INPUT int MACD_PriceLimitMethod = 0;                        // Price limit method
-INPUT float MACD_PriceLimitLevel = 0;                      // Price limit level
-INPUT float MACD_MaxSpread = 6.0;                          // Max spread to trade (pips)
+INPUT float MACD_PriceLimitLevel = 0;                       // Price limit level
+INPUT float MACD_MaxSpread = 6.0;                           // Max spread to trade (pips)
 
 // Includes.
 #include <EA31337-classes/Indicators/Indi_MACD.mqh>
@@ -31,14 +31,14 @@ struct Stg_MACD_Params : StgParams {
   ENUM_APPLIED_PRICE MACD_Applied_Price;
   int MACD_Shift;
   int MACD_SignalOpenMethod;
-  double MACD_SignalOpenLevel;
+  float MACD_SignalOpenLevel;
   int MACD_SignalOpenFilterMethod;
   int MACD_SignalOpenBoostMethod;
   int MACD_SignalCloseMethod;
-  double MACD_SignalCloseLevel;
+  float MACD_SignalCloseLevel;
   int MACD_PriceLimitMethod;
-  double MACD_PriceLimitLevel;
-  double MACD_MaxSpread;
+  float MACD_PriceLimitLevel;
+  float MACD_MaxSpread;
 
   // Constructor: Set default param values.
   Stg_MACD_Params()
@@ -168,6 +168,6 @@ class Stg_MACD : public Strategy {
       }
       _result += _trail * _direction;
     }
-    return _result;
+    return (float)_result;
   }
 };
