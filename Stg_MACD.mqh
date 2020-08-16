@@ -3,64 +3,71 @@
  * Implements MACD strategy based on the Moving Averages Convergence/Divergence indicator.
  */
 
-// User input params.
-INPUT int MACD_Period_Fast = 23;                            // Period Fast
-INPUT int MACD_Period_Slow = 21;                            // Period Slow
-INPUT int MACD_Period_Signal = 10;                          // Period for signal
-INPUT ENUM_APPLIED_PRICE MACD_Applied_Price = PRICE_CLOSE;  // Applied Price
-INPUT int MACD_Shift = 3;                                   // Shift
-INPUT int MACD_SignalOpenMethod = -26;                      // Signal open method (-31-31)
-INPUT float MACD_SignalOpenLevel = 0.1f;                    // Signal open level
-INPUT int MACD_SignalOpenFilterMethod = 0;                  // Signal open filter method
-INPUT int MACD_SignalOpenBoostMethod = 0;                   // Signal open boost method
-INPUT int MACD_SignalCloseMethod = -26;                     // Signal close method (-31-31)
-INPUT float MACD_SignalCloseLevel = 0.1f;                   // Signal close level
-INPUT int MACD_PriceLimitMethod = 0;                        // Price limit method
-INPUT float MACD_PriceLimitLevel = 0;                       // Price limit level
-INPUT float MACD_MaxSpread = 6.0;                           // Max spread to trade (pips)
-
 // Includes.
 #include <EA31337-classes/Indicators/Indi_MACD.mqh>
 #include <EA31337-classes/Strategy.mqh>
 
+// User input params.
+INPUT float MACD_LotSize = 0;               // Lot size
+INPUT int MACD_SignalOpenMethod = -26;      // Signal open method (-31-31)
+INPUT float MACD_SignalOpenLevel = 0.1f;    // Signal open level
+INPUT int MACD_SignalOpenFilterMethod = 0;  // Signal open filter method
+INPUT int MACD_SignalOpenBoostMethod = 0;   // Signal open boost method
+INPUT int MACD_SignalCloseMethod = -26;     // Signal close method (-31-31)
+INPUT float MACD_SignalCloseLevel = 0.1f;   // Signal close level
+INPUT int MACD_PriceLimitMethod = 0;        // Price limit method
+INPUT float MACD_PriceLimitLevel = 0;       // Price limit level
+INPUT int MACD_TickFilterMethod = 0;        // Tick filter method
+INPUT float MACD_MaxSpread = 6.0;           // Max spread to trade (pips)
+INPUT int MACD_Shift = 3;                   // Shift
+INPUT string __MACD_Indi_MACD_Parameters__ =
+    "-- MACD strategy: MACD indicator params --";                // >>> MACD strategy: MACD indicator <<<
+INPUT int Indi_MACD_Period_Fast = 23;                            // Period Fast
+INPUT int Indi_MACD_Period_Slow = 21;                            // Period Slow
+INPUT int Indi_MACD_Period_Signal = 10;                          // Period for signal
+INPUT ENUM_APPLIED_PRICE Indi_MACD_Applied_Price = PRICE_CLOSE;  // Applied Price
+
+// Structs.
+
+// Defines struct with default user indicator values.
+struct Indi_MACD_Params_Defaults : MACDParams {
+  Indi_MACD_Params_Defaults()
+      : MACDParams(::Indi_MACD_Period_Fast, ::Indi_MACD_Period_Slow, ::Indi_MACD_Period_Signal,
+                   ::Indi_MACD_Applied_Price) {}
+} indi_macd_defaults;
+
+// Defines struct to store indicator parameter values.
+struct Indi_MACD_Params : public MACDParams {
+  // Struct constructors.
+  void Indi_MACD_Params(MACDParams &_params, ENUM_TIMEFRAMES _tf) : MACDParams(_params, _tf) {}
+};
+
+// Defines struct with default user strategy values.
+struct Stg_MACD_Params_Defaults : StgParams {
+  Stg_MACD_Params_Defaults()
+      : StgParams(::MACD_SignalOpenMethod, ::MACD_SignalOpenFilterMethod, ::MACD_SignalOpenLevel,
+                  ::MACD_SignalOpenBoostMethod, ::MACD_SignalCloseMethod, ::MACD_SignalCloseLevel,
+                  ::MACD_PriceLimitMethod, ::MACD_PriceLimitLevel, ::MACD_TickFilterMethod, ::MACD_MaxSpread,
+                  ::MACD_Shift) {}
+} stg_macd_defaults;
+
 // Struct to define strategy parameters to override.
 struct Stg_MACD_Params : StgParams {
-  int MACD_Period_Fast;
-  int MACD_Period_Slow;
-  int MACD_Period_Signal;
-  ENUM_APPLIED_PRICE MACD_Applied_Price;
-  int MACD_Shift;
-  int MACD_SignalOpenMethod;
-  float MACD_SignalOpenLevel;
-  int MACD_SignalOpenFilterMethod;
-  int MACD_SignalOpenBoostMethod;
-  int MACD_SignalCloseMethod;
-  float MACD_SignalCloseLevel;
-  int MACD_PriceLimitMethod;
-  float MACD_PriceLimitLevel;
-  float MACD_MaxSpread;
+  Indi_MACD_Params iparams;
+  StgParams sparams;
 
-  // Constructor: Set default param values.
-  Stg_MACD_Params()
-      : MACD_Period_Fast(::MACD_Period_Fast),
-        MACD_Period_Slow(::MACD_Period_Slow),
-        MACD_Period_Signal(::MACD_Period_Signal),
-        MACD_Applied_Price(::MACD_Applied_Price),
-        MACD_Shift(::MACD_Shift),
-        MACD_SignalOpenMethod(::MACD_SignalOpenMethod),
-        MACD_SignalOpenLevel(::MACD_SignalOpenLevel),
-        MACD_SignalOpenFilterMethod(::MACD_SignalOpenFilterMethod),
-        MACD_SignalOpenBoostMethod(::MACD_SignalOpenBoostMethod),
-        MACD_SignalCloseMethod(::MACD_SignalCloseMethod),
-        MACD_SignalCloseLevel(::MACD_SignalCloseLevel),
-        MACD_PriceLimitMethod(::MACD_PriceLimitMethod),
-        MACD_PriceLimitLevel(::MACD_PriceLimitLevel),
-        MACD_MaxSpread(::MACD_MaxSpread) {}
+  // Struct constructors.
+  Stg_MACD_Params(Indi_MACD_Params &_iparams, StgParams &_sparams)
+      : iparams(indi_macd_defaults, _iparams.tf), sparams(stg_macd_defaults) {
+    iparams = _iparams;
+    sparams = _sparams;
+  }
 };
 
 // Loads pair specific param values.
 #include "sets/EURUSD_H1.h"
 #include "sets/EURUSD_H4.h"
+#include "sets/EURUSD_H8.h"
 #include "sets/EURUSD_M1.h"
 #include "sets/EURUSD_M15.h"
 #include "sets/EURUSD_M30.h"
@@ -72,25 +79,24 @@ class Stg_MACD : public Strategy {
 
   static Stg_MACD *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
     // Initialize strategy initial values.
-    Stg_MACD_Params _params;
+    Indi_MACD_Params _indi_params(indi_macd_defaults, _tf);
+    StgParams _stg_params(stg_macd_defaults);
     if (!Terminal::IsOptimization()) {
-      SetParamsByTf<Stg_MACD_Params>(_params, _tf, stg_macd_m1, stg_macd_m5, stg_macd_m15, stg_macd_m30, stg_macd_h1,
-                                     stg_macd_h4, stg_macd_h4);
+      SetParamsByTf<Indi_MACD_Params>(_indi_params, _tf, indi_macd_m1, indi_macd_m5, indi_macd_m15, indi_macd_m30,
+                                      indi_macd_h1, indi_macd_h4, indi_macd_h8);
+      SetParamsByTf<StgParams>(_stg_params, _tf, stg_macd_m1, stg_macd_m5, stg_macd_m15, stg_macd_m30, stg_macd_h1,
+                               stg_macd_h4, stg_macd_h8);
     }
+    // Initialize indicator.
+    MACDParams macd_params(_indi_params);
+    _stg_params.SetIndicator(new Indi_MACD(_indi_params));
     // Initialize strategy parameters.
-    MACDParams macd_params(_params.MACD_Period_Fast, _params.MACD_Period_Slow, _params.MACD_Period_Signal,
-                           _params.MACD_Applied_Price);
-    macd_params.SetTf(_tf);
-    StgParams sparams(new Trade(_tf, _Symbol), new Indi_MACD(macd_params), NULL, NULL);
-    sparams.logger.Ptr().SetLevel(_log_level);
-    sparams.SetMagicNo(_magic_no);
-    sparams.SetSignals(_params.MACD_SignalOpenMethod, _params.MACD_SignalOpenLevel, _params.MACD_SignalCloseMethod,
-                       _params.MACD_SignalOpenFilterMethod, _params.MACD_SignalOpenBoostMethod,
-                       _params.MACD_SignalCloseLevel);
-    sparams.SetPriceLimits(_params.MACD_PriceLimitMethod, _params.MACD_PriceLimitLevel);
-    sparams.SetMaxSpread(_params.MACD_MaxSpread);
+    _stg_params.GetLog().SetLevel(_log_level);
+    _stg_params.SetMagicNo(_magic_no);
+    _stg_params.SetTf(_tf, _Symbol);
     // Initialize strategy instance.
-    Strategy *_strat = new Stg_MACD(sparams, "MACD");
+    Strategy *_strat = new Stg_MACD(_stg_params, "MACD");
+    _stg_params.SetStops(_strat, _strat);
     return _strat;
   }
 
@@ -144,21 +150,21 @@ class Stg_MACD : public Strategy {
     if (_is_valid) {
       switch (_method) {
         case 0: {
-          int _bar_count = (int)_level * (int)_indi.GetEmaFastPeriod();
-          _result = _direction < 0 ? _indi.GetPrice(PRICE_HIGH, _indi.GetHighest(_bar_count))
-                                   : _indi.GetPrice(PRICE_LOW, _indi.GetLowest(_bar_count));
+          int _bar_count0 = (int)_level * (int)_indi.GetEmaFastPeriod();
+          _result = _direction < 0 ? _indi.GetPrice(PRICE_HIGH, _indi.GetHighest(_bar_count0))
+                                   : _indi.GetPrice(PRICE_LOW, _indi.GetLowest(_bar_count0));
           break;
         }
         case 1: {
-          int _bar_count = (int)_level * (int)_indi.GetEmaSlowPeriod();
-          _result = _direction < 0 ? _indi.GetPrice(PRICE_HIGH, _indi.GetHighest(_bar_count))
-                                   : _indi.GetPrice(PRICE_LOW, _indi.GetLowest(_bar_count));
+          int _bar_count1 = (int)_level * (int)_indi.GetEmaSlowPeriod();
+          _result = _direction < 0 ? _indi.GetPrice(PRICE_HIGH, _indi.GetHighest(_bar_count1))
+                                   : _indi.GetPrice(PRICE_LOW, _indi.GetLowest(_bar_count1));
           break;
         }
         case 2: {
-          int _bar_count = (int)_level * (int)_indi.GetSignalPeriod();
-          _result = _direction < 0 ? _indi.GetPrice(PRICE_HIGH, _indi.GetHighest(_bar_count))
-                                   : _indi.GetPrice(PRICE_LOW, _indi.GetLowest(_bar_count));
+          int _bar_count2 = (int)_level * (int)_indi.GetSignalPeriod();
+          _result = _direction < 0 ? _indi.GetPrice(PRICE_HIGH, _indi.GetHighest(_bar_count2))
+                                   : _indi.GetPrice(PRICE_LOW, _indi.GetLowest(_bar_count2));
           break;
         }
         case 3:
