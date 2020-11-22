@@ -15,8 +15,8 @@ INPUT int MACD_SignalOpenFilterMethod = 0;  // Signal open filter method
 INPUT int MACD_SignalOpenBoostMethod = 0;   // Signal open boost method
 INPUT int MACD_SignalCloseMethod = -26;     // Signal close method (-31-31)
 INPUT float MACD_SignalCloseLevel = 0.1f;   // Signal close level
-INPUT int MACD_PriceLimitMethod = 0;        // Price limit method
-INPUT float MACD_PriceLimitLevel = 0;       // Price limit level
+INPUT int MACD_PriceStopMethod = 0;         // Price stop method
+INPUT float MACD_PriceStopLevel = 0;        // Price stop level
 INPUT int MACD_TickFilterMethod = 0;        // Tick filter method
 INPUT float MACD_MaxSpread = 6.0;           // Max spread to trade (pips)
 INPUT int MACD_Shift = 3;                   // Shift
@@ -47,7 +47,7 @@ struct Stg_MACD_Params_Defaults : StgParams {
   Stg_MACD_Params_Defaults()
       : StgParams(::MACD_SignalOpenMethod, ::MACD_SignalOpenFilterMethod, ::MACD_SignalOpenLevel,
                   ::MACD_SignalOpenBoostMethod, ::MACD_SignalCloseMethod, ::MACD_SignalCloseLevel,
-                  ::MACD_PriceLimitMethod, ::MACD_PriceLimitLevel, ::MACD_TickFilterMethod, ::MACD_MaxSpread,
+                  ::MACD_PriceStopMethod, ::MACD_PriceStopLevel, ::MACD_TickFilterMethod, ::MACD_MaxSpread,
                   ::MACD_Shift) {}
 } stg_macd_defaults;
 
@@ -138,9 +138,9 @@ class Stg_MACD : public Strategy {
   }
 
   /**
-   * Gets price limit value for profit take or stop loss.
+   * Gets price stop value for profit take or stop loss.
    */
-  float PriceLimit(ENUM_ORDER_TYPE _cmd, ENUM_ORDER_TYPE_VALUE _mode, int _method = 0, float _level = 0.0) {
+  float PriceStop(ENUM_ORDER_TYPE _cmd, ENUM_ORDER_TYPE_VALUE _mode, int _method = 0, float _level = 0.0) {
     Indi_MACD *_indi = Data();
     bool _is_valid = _indi[CURR].IsValid() && _indi[PREV].IsValid() && _indi[PPREV].IsValid();
     double _trail = _level * Market().GetPipSize();
