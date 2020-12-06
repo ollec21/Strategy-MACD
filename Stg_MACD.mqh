@@ -3,10 +3,6 @@
  * Implements MACD strategy based on the Moving Averages Convergence/Divergence indicator.
  */
 
-// Includes.
-#include <EA31337-classes/Indicators/Indi_MACD.mqh>
-#include <EA31337-classes/Strategy.mqh>
-
 // User input params.
 INPUT float MACD_LotSize = 0;               // Lot size
 INPUT int MACD_SignalOpenMethod = -26;      // Signal open method (-31-31)
