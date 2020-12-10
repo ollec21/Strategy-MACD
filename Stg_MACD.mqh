@@ -108,24 +108,24 @@ class Stg_MACD : public Strategy {
       switch (_cmd) {
         case ORDER_TYPE_BUY:
           // Buy: MACD rises above the signal line.
-          _result =
-              _indi[PPREV][LINE_MAIN] < 0 &&
-              _indi[CURR][LINE_MAIN] > _indi[CURR][LINE_SIGNAL] + _level_pips;  // MACD rises above the signal line.
+          _result = _indi[PPREV][(int)LINE_MAIN] < 0 &&
+                    _indi[CURR][(int)LINE_MAIN] >
+                        _indi[CURR][(int)LINE_SIGNAL] + _level_pips;  // MACD rises above the signal line.
           if (_method != 0) {
-            if (METHOD(_method, 0)) _result &= _indi[PPREV][LINE_MAIN] < _indi[PPREV][LINE_SIGNAL];
+            if (METHOD(_method, 0)) _result &= _indi[PPREV][(int)LINE_MAIN] < _indi[PPREV][(int)LINE_SIGNAL];
             // Buy: crossing 0 upwards.
-            if (METHOD(_method, 1)) _result &= _indi[CURR][LINE_MAIN] > 0;
+            if (METHOD(_method, 1)) _result &= _indi[CURR][(int)LINE_MAIN] > 0;
           }
           break;
         case ORDER_TYPE_SELL:
           // Sell: MACD falls below the signal line.
-          _result =
-              _indi[PPREV][LINE_MAIN] > 0 &&
-              _indi[CURR][LINE_MAIN] > _indi[CURR][LINE_SIGNAL] - _level_pips;  // MACD falls below the signal line.
+          _result = _indi[PPREV][(int)LINE_MAIN] > 0 &&
+                    _indi[CURR][(int)LINE_MAIN] >
+                        _indi[CURR][(int)LINE_SIGNAL] - _level_pips;  // MACD falls below the signal line.
           if (_method != 0) {
-            if (METHOD(_method, 0)) _result &= _indi[PPREV][LINE_MAIN] > _indi[PPREV][LINE_SIGNAL];
+            if (METHOD(_method, 0)) _result &= _indi[PPREV][(int)LINE_MAIN] > _indi[PPREV][(int)LINE_SIGNAL];
             // Sell: crossing 0 downwards.
-            if (METHOD(_method, 1)) _result &= _indi[CURR][LINE_MAIN] < 0;
+            if (METHOD(_method, 1)) _result &= _indi[CURR][(int)LINE_MAIN] < 0;
           }
           break;
       }
@@ -164,8 +164,8 @@ class Stg_MACD : public Strategy {
           break;
         }
         case 4:
-          _result = (_direction > 0 ? fmax(_indi[PPREV][LINE_MAIN], _indi[PPREV][LINE_SIGNAL])
-                                    : fmin(_indi[PPREV][LINE_MAIN], _indi[PPREV][LINE_SIGNAL]));
+          _result = (_direction > 0 ? fmax(_indi[PPREV][(int)LINE_MAIN], _indi[PPREV][(int)LINE_SIGNAL])
+                                    : fmin(_indi[PPREV][(int)LINE_MAIN], _indi[PPREV][(int)LINE_SIGNAL]));
           break;
       }
       _result += _trail * _direction;
