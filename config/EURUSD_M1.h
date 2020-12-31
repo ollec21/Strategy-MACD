@@ -13,7 +13,7 @@ struct Stg_MACD_Params_M1 : StgParams {
   // Struct constructor.
   Stg_MACD_Params_M1() : StgParams(stg_macd_defaults) {
     lot_size = 0;
-    signal_open_method = 0;
+    signal_open_method = 3;
     signal_open_filter = 1;
     signal_open_level = 0;
     signal_open_boost = 0;
