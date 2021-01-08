@@ -25,7 +25,7 @@ struct Stg_MACD_Params_{{ Timeframe }} : StgParams {
     signal_close_method = {{ MACD_SignalCloseMethod | default(0) }};
     signal_close_level = (float){{ MACD_SignalCloseLevel | default(0) }};
     price_stop_method = {{ MACD_PriceStopMethod | default(0) }};
-    price_stop_level = {{ MACD_SignalCloseLevel | default(1) }};
+    price_stop_level = (float){{ MACD_SignalCloseLevel | default(1) }};
     tick_filter_method = {{ MACD_TickFilterMethod  | default(1) }};
     max_spread = {{ MACD_MaxSpread | default(0) }};
   }
