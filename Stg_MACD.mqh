@@ -18,19 +18,20 @@ INPUT float MACD_MaxSpread = 4.0;           // Max spread to trade (pips)
 INPUT int MACD_Shift = 3;                   // Shift
 INPUT int MACD_OrderCloseTime = -20;        // Order close time in mins (>0) or bars (<0)
 INPUT string __MACD_Indi_MACD_Parameters__ =
-    "-- MACD strategy: MACD indicator params --";                // >>> MACD strategy: MACD indicator <<<
-INPUT int Indi_MACD_Period_Fast = 23;                            // Period Fast
-INPUT int Indi_MACD_Period_Slow = 21;                            // Period Slow
-INPUT int Indi_MACD_Period_Signal = 10;                          // Period for signal
-INPUT ENUM_APPLIED_PRICE Indi_MACD_Applied_Price = PRICE_CLOSE;  // Applied Price
+    "-- MACD strategy: MACD indicator params --";                     // >>> MACD strategy: MACD indicator <<<
+INPUT int MACD_Indi_MACD_Period_Fast = 23;                            // Period Fast
+INPUT int MACD_Indi_MACD_Period_Slow = 21;                            // Period Slow
+INPUT int MACD_Indi_MACD_Period_Signal = 10;                          // Period for signal
+INPUT ENUM_APPLIED_PRICE MACD_Indi_MACD_Applied_Price = PRICE_CLOSE;  // Applied Price
+INPUT int MACD_Indi_MACD_Period_Shift = 0;                            // Shift
 
 // Structs.
 
 // Defines struct with default user indicator values.
 struct Indi_MACD_Params_Defaults : MACDParams {
   Indi_MACD_Params_Defaults()
-      : MACDParams(::Indi_MACD_Period_Fast, ::Indi_MACD_Period_Slow, ::Indi_MACD_Period_Signal,
-                   ::Indi_MACD_Applied_Price) {}
+      : MACDParams(::MACD_Indi_MACD_Period_Fast, ::MACD_Indi_MACD_Period_Slow, ::MACD_Indi_MACD_Period_Signal,
+                   ::MACD_Indi_MACD_Applied_Price, ::MACD_Indi_MACD_Period_Shift) {}
 } indi_macd_defaults;
 
 // Defines struct to store indicator parameter values.
