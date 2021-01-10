@@ -5,17 +5,17 @@
 
 // User input params.
 INPUT float MACD_LotSize = 0;               // Lot size
-INPUT int MACD_SignalOpenMethod = 0;        // Signal open method (-31-31)
+INPUT int MACD_SignalOpenMethod = 0;        // Signal open method (-15-15)
 INPUT float MACD_SignalOpenLevel = 0.0f;    // Signal open level
 INPUT int MACD_SignalOpenFilterMethod = 1;  // Signal open filter method
 INPUT int MACD_SignalOpenBoostMethod = 0;   // Signal open boost method
-INPUT int MACD_SignalCloseMethod = -26;     // Signal close method (-31-31)
+INPUT int MACD_SignalCloseMethod = 0;       // Signal close method (-15-15)
 INPUT float MACD_SignalCloseLevel = 0.0f;   // Signal close level
 INPUT int MACD_PriceStopMethod = 0;         // Price stop method
 INPUT float MACD_PriceStopLevel = 0;        // Price stop level
 INPUT int MACD_TickFilterMethod = 1;        // Tick filter method
 INPUT float MACD_MaxSpread = 4.0;           // Max spread to trade (pips)
-INPUT int MACD_Shift = 3;                   // Shift
+INPUT int MACD_Shift = 0;                   // Shift
 INPUT int MACD_OrderCloseTime = -20;        // Order close time in mins (>0) or bars (<0)
 INPUT string __MACD_Indi_MACD_Parameters__ =
     "-- MACD strategy: MACD indicator params --";                     // >>> MACD strategy: MACD indicator <<<
@@ -105,29 +105,36 @@ class Stg_MACD : public Strategy {
     Indi_MACD *_indi = Data();
     bool _is_valid = _indi[CURR].IsValid() && _indi[PREV].IsValid() && _indi[PPREV].IsValid();
     bool _result = _is_valid;
-    double _level_pips = _level * Chart().GetPipSize();
     if (_is_valid) {
       switch (_cmd) {
         case ORDER_TYPE_BUY:
-          // Buy: MACD rises above the signal line.
-          _result = _indi[PPREV][(int)LINE_MAIN] < 0 &&
-                    _indi[CURR][(int)LINE_MAIN] >
-                        _indi[CURR][(int)LINE_SIGNAL] + _level_pips;  // MACD rises above the signal line.
+          _result &= _indi.IsIncreasing(2, LINE_MAIN);
+          _result &= _indi.IsIncreasing(2, LINE_SIGNAL);
+          _result &= _indi.IsIncByPct(_level, LINE_SIGNAL, _shift, 2);
           if (_method != 0) {
             if (METHOD(_method, 0)) _result &= _indi[PPREV][(int)LINE_MAIN] < _indi[PPREV][(int)LINE_SIGNAL];
-            // Buy: crossing 0 upwards.
+            // Crossing 0 upwards.
             if (METHOD(_method, 1)) _result &= _indi[CURR][(int)LINE_MAIN] > 0;
+            // MACD rises above the signal line.
+            if (METHOD(_method, 2))
+              _result &=
+                  _indi[PPREV][(int)LINE_MAIN] < 0 && _indi[CURR][(int)LINE_MAIN] > _indi[CURR][(int)LINE_SIGNAL];
+            if (METHOD(_method, 3)) _result &= _indi.IsIncreasing(2, LINE_SIGNAL);
           }
           break;
         case ORDER_TYPE_SELL:
-          // Sell: MACD falls below the signal line.
-          _result = _indi[PPREV][(int)LINE_MAIN] > 0 &&
-                    _indi[CURR][(int)LINE_MAIN] >
-                        _indi[CURR][(int)LINE_SIGNAL] - _level_pips;  // MACD falls below the signal line.
+          _result &= _indi.IsDecreasing(2, LINE_MAIN);
+          _result &= _indi.IsDecreasing(2, LINE_SIGNAL);
+          _result &= _indi.IsDecByPct(-_level, LINE_SIGNAL, _shift, 2);
           if (_method != 0) {
             if (METHOD(_method, 0)) _result &= _indi[PPREV][(int)LINE_MAIN] > _indi[PPREV][(int)LINE_SIGNAL];
             // Sell: crossing 0 downwards.
             if (METHOD(_method, 1)) _result &= _indi[CURR][(int)LINE_MAIN] < 0;
+            // Sell: MACD falls below the signal line.
+            if (METHOD(_method, 2))
+              _result &=
+                  _indi[PPREV][(int)LINE_MAIN] > 0 && _indi[CURR][(int)LINE_MAIN] > _indi[CURR][(int)LINE_SIGNAL];
+            if (METHOD(_method, 3)) _result &= _indi.IsDecreasing(2, LINE_SIGNAL);
           }
           break;
       }
