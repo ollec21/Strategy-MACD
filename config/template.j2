@@ -4,8 +4,8 @@
  */
 
 // Defines indicator's parameter values for the given pair symbol and timeframe.
-struct Indi_MACD_Params_{{ Timeframe }} : Indi_MACD_Params {
-  Indi_MACD_Params_{{ Timeframe }}() : Indi_MACD_Params(indi_macd_defaults, PERIOD_{{ Timeframe }}) {
+struct Indi_MACD_Params_{{ Timeframe }} : MACDParams {
+  Indi_MACD_Params_{{ Timeframe }}() : MACDParams(indi_macd_defaults, PERIOD_{{ Timeframe }}) {
     applied_price = (ENUM_APPLIED_PRICE){{ MACD_Indi_MACD_Applied_Price | default(0) }};
     ema_fast_period = {{ MACD_Indi_MACD_Period_Fast | default(0) }};
     ema_slow_period = {{ MACD_Indi_MACD_Period_Slow | default(0) }};

@@ -34,12 +34,6 @@ struct Indi_MACD_Params_Defaults : MACDParams {
                    ::MACD_Indi_MACD_Applied_Price, ::MACD_Indi_MACD_Period_Shift) {}
 } indi_macd_defaults;
 
-// Defines struct to store indicator parameter values.
-struct Indi_MACD_Params : public MACDParams {
-  // Struct constructors.
-  void Indi_MACD_Params(MACDParams &_params, ENUM_TIMEFRAMES _tf) : MACDParams(_params, _tf) {}
-};
-
 // Defines struct with default user strategy values.
 struct Stg_MACD_Params_Defaults : StgParams {
   Stg_MACD_Params_Defaults()
@@ -51,11 +45,11 @@ struct Stg_MACD_Params_Defaults : StgParams {
 
 // Struct to define strategy parameters to override.
 struct Stg_MACD_Params : StgParams {
-  Indi_MACD_Params iparams;
+  MACDParams iparams;
   StgParams sparams;
 
   // Struct constructors.
-  Stg_MACD_Params(Indi_MACD_Params &_iparams, StgParams &_sparams)
+  Stg_MACD_Params(MACDParams &_iparams, StgParams &_sparams)
       : iparams(indi_macd_defaults, _iparams.tf), sparams(stg_macd_defaults) {
     iparams = _iparams;
     sparams = _sparams;
@@ -77,11 +71,11 @@ class Stg_MACD : public Strategy {
 
   static Stg_MACD *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
     // Initialize strategy initial values.
-    Indi_MACD_Params _indi_params(indi_macd_defaults, _tf);
+    MACDParams _indi_params(indi_macd_defaults, _tf);
     StgParams _stg_params(stg_macd_defaults);
     if (!Terminal::IsOptimization()) {
-      SetParamsByTf<Indi_MACD_Params>(_indi_params, _tf, indi_macd_m1, indi_macd_m5, indi_macd_m15, indi_macd_m30,
-                                      indi_macd_h1, indi_macd_h4, indi_macd_h8);
+      SetParamsByTf<MACDParams>(_indi_params, _tf, indi_macd_m1, indi_macd_m5, indi_macd_m15, indi_macd_m30,
+                                indi_macd_h1, indi_macd_h4, indi_macd_h8);
       SetParamsByTf<StgParams>(_stg_params, _tf, stg_macd_m1, stg_macd_m5, stg_macd_m15, stg_macd_m30, stg_macd_h1,
                                stg_macd_h4, stg_macd_h8);
     }
