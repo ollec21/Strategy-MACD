@@ -18,12 +18,12 @@ INPUT float MACD_MaxSpread = 4.0;           // Max spread to trade (pips)
 INPUT int MACD_Shift = 0;                   // Shift
 INPUT int MACD_OrderCloseTime = -20;        // Order close time in mins (>0) or bars (<0)
 INPUT string __MACD_Indi_MACD_Parameters__ =
-    "-- MACD strategy: MACD indicator params --";                     // >>> MACD strategy: MACD indicator <<<
-INPUT int MACD_Indi_MACD_Period_Fast = 23;                            // Period Fast
-INPUT int MACD_Indi_MACD_Period_Slow = 21;                            // Period Slow
-INPUT int MACD_Indi_MACD_Period_Signal = 10;                          // Period for signal
-INPUT ENUM_APPLIED_PRICE MACD_Indi_MACD_Applied_Price = PRICE_CLOSE;  // Applied Price
-INPUT int MACD_Indi_MACD_Period_Shift = 0;                            // Shift
+    "-- MACD strategy: MACD indicator params --";                               // >>> MACD strategy: MACD indicator <<<
+INPUT int MACD_Indi_MACD_Period_Fast = 16;                                      // Period Fast
+INPUT int MACD_Indi_MACD_Period_Slow = 30;                                      // Period Slow
+INPUT int MACD_Indi_MACD_Period_Signal = 8;                                     // Period for signal
+INPUT ENUM_APPLIED_PRICE MACD_Indi_MACD_Applied_Price = (ENUM_APPLIED_PRICE)3;  // Applied Price
+INPUT int MACD_Indi_MACD_Period_Shift = 0;                                      // Shift
 
 // Structs.
 

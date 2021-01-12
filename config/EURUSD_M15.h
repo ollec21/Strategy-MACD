@@ -5,7 +5,10 @@
 
 // Defines indicator's parameter values for the given pair symbol and timeframe.
 struct Indi_MACD_Params_M15 : MACDParams {
-  Indi_MACD_Params_M15() : MACDParams(indi_macd_defaults, PERIOD_M15) { shift = 0; }
+  Indi_MACD_Params_M15() : MACDParams(indi_macd_defaults, PERIOD_M15) {
+    applied_price = (ENUM_APPLIED_PRICE)3;
+    shift = 0;
+  }
 } indi_macd_m15;
 
 // Defines strategy's parameter values for the given pair symbol and timeframe.
