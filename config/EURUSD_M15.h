@@ -7,10 +7,10 @@
 struct Indi_MACD_Params_M15 : MACDParams {
   Indi_MACD_Params_M15() : MACDParams(indi_macd_defaults, PERIOD_M15) {
     applied_price = (ENUM_APPLIED_PRICE)2;
-    ema_fast_period = 24;
-    ema_slow_period = 30;
+    ema_fast_period = 6;
+    ema_slow_period = 34;
     shift = 0;
-    signal_period = 8;
+    signal_period = 10;
   }
 } indi_macd_m15;
 

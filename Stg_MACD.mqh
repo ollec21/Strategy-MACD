@@ -23,7 +23,7 @@ INPUT int MACD_Indi_MACD_Period_Fast = 16;                                      
 INPUT int MACD_Indi_MACD_Period_Slow = 30;                                      // Period Slow
 INPUT int MACD_Indi_MACD_Period_Signal = 8;                                     // Period for signal
 INPUT ENUM_APPLIED_PRICE MACD_Indi_MACD_Applied_Price = (ENUM_APPLIED_PRICE)3;  // Applied Price
-INPUT int MACD_Indi_MACD_Period_Shift = 0;                                      // Shift
+INPUT int MACD_Indi_MACD_Shift = 0;                                             // Shift
 
 // Structs.
 
@@ -31,7 +31,7 @@ INPUT int MACD_Indi_MACD_Period_Shift = 0;                                      
 struct Indi_MACD_Params_Defaults : MACDParams {
   Indi_MACD_Params_Defaults()
       : MACDParams(::MACD_Indi_MACD_Period_Fast, ::MACD_Indi_MACD_Period_Slow, ::MACD_Indi_MACD_Period_Signal,
-                   ::MACD_Indi_MACD_Applied_Price, ::MACD_Indi_MACD_Period_Shift) {}
+                   ::MACD_Indi_MACD_Applied_Price, ::MACD_Indi_MACD_Shift) {}
 } indi_macd_defaults;
 
 // Defines struct with default user strategy values.
