@@ -7,8 +7,8 @@
 struct Indi_MACD_Params_M5 : MACDParams {
   Indi_MACD_Params_M5() : MACDParams(indi_macd_defaults, PERIOD_M5) {
     applied_price = (ENUM_APPLIED_PRICE)4;
-    ema_fast_period = 16;
-    ema_slow_period = 30;
+    ema_fast_period = 12;
+    ema_slow_period = 42;
     shift = 0;
     signal_period = 8;
   }

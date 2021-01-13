@@ -10,7 +10,7 @@ struct Indi_MACD_Params_M30 : MACDParams {
     ema_fast_period = 8;
     ema_slow_period = 30;
     shift = 0;
-    signal_period = 8;
+    signal_period = 10;
   }
 } indi_macd_m30;
 
