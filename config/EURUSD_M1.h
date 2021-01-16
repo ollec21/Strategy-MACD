@@ -1,4 +1,4 @@
-/*
+/**
  * @file
  * Defines default strategy parameter values for the given timeframe.
  */
@@ -7,10 +7,10 @@
 struct Indi_MACD_Params_M1 : MACDParams {
   Indi_MACD_Params_M1() : MACDParams(indi_macd_defaults, PERIOD_M1) {
     applied_price = (ENUM_APPLIED_PRICE)0;
-    ema_fast_period = 20;
-    ema_slow_period = 26;
-    shift = 0;
+    ema_fast_period = 26;
+    ema_slow_period = 34;
     signal_period = 12;
+    shift = 0;
   }
 } indi_macd_m1;
 
@@ -21,12 +21,12 @@ struct Stg_MACD_Params_M1 : StgParams {
     lot_size = 0;
     signal_open_method = 0;
     signal_open_filter = 1;
-    signal_open_level = (float)0;
+    signal_open_level = (float)0.0;
     signal_open_boost = 0;
     signal_close_method = 0;
     signal_close_level = (float)0;
     price_stop_method = 0;
-    price_stop_level = (float)2;
+    price_stop_level = (float)1;
     tick_filter_method = 1;
     max_spread = 0;
   }
