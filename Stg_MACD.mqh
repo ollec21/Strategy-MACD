@@ -89,7 +89,6 @@ class Stg_MACD : public Strategy {
     _stg_params.SetTf(_tf, _Symbol);
     // Initialize strategy instance.
     Strategy *_strat = new Stg_MACD(_stg_params, "MACD");
-    _stg_params.SetStops(_strat, _strat);
     return _strat;
   }
 
