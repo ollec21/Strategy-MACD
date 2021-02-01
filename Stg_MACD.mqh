@@ -74,12 +74,12 @@ class Stg_MACD : public Strategy {
     // Initialize strategy initial values.
     MACDParams _indi_params(indi_macd_defaults, _tf);
     StgParams _stg_params(stg_macd_defaults);
-    if (!Terminal::IsOptimization()) {
-      SetParamsByTf<MACDParams>(_indi_params, _tf, indi_macd_m1, indi_macd_m5, indi_macd_m15, indi_macd_m30,
-                                indi_macd_h1, indi_macd_h4, indi_macd_h8);
-      SetParamsByTf<StgParams>(_stg_params, _tf, stg_macd_m1, stg_macd_m5, stg_macd_m15, stg_macd_m30, stg_macd_h1,
-                               stg_macd_h4, stg_macd_h8);
-    }
+#ifdef __config__
+    SetParamsByTf<MACDParams>(_indi_params, _tf, indi_macd_m1, indi_macd_m5, indi_macd_m15, indi_macd_m30, indi_macd_h1,
+                              indi_macd_h4, indi_macd_h8);
+    SetParamsByTf<StgParams>(_stg_params, _tf, stg_macd_m1, stg_macd_m5, stg_macd_m15, stg_macd_m30, stg_macd_h1,
+                             stg_macd_h4, stg_macd_h8);
+#endif
     // Initialize indicator.
     MACDParams macd_params(_indi_params);
     _stg_params.SetIndicator(new Indi_MACD(_indi_params));
