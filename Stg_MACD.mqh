@@ -4,19 +4,20 @@
  */
 
 // User input params.
-INPUT float MACD_LotSize = 0;               // Lot size
-INPUT int MACD_SignalOpenMethod = 0;        // Signal open method (-15-15)
-INPUT float MACD_SignalOpenLevel = 0.0f;    // Signal open level
-INPUT int MACD_SignalOpenFilterMethod = 1;  // Signal open filter method
-INPUT int MACD_SignalOpenBoostMethod = 0;   // Signal open boost method
-INPUT int MACD_SignalCloseMethod = 0;       // Signal close method (-15-15)
-INPUT float MACD_SignalCloseLevel = 0.0f;   // Signal close level
-INPUT int MACD_PriceStopMethod = 0;         // Price stop method
-INPUT float MACD_PriceStopLevel = 0;        // Price stop level
-INPUT int MACD_TickFilterMethod = 1;        // Tick filter method
-INPUT float MACD_MaxSpread = 4.0;           // Max spread to trade (pips)
-INPUT int MACD_Shift = 0;                   // Shift
-INPUT int MACD_OrderCloseTime = -20;        // Order close time in mins (>0) or bars (<0)
+INPUT string __MACD_Parameters__ = "-- MACD strategy params --";  // >>> MACD <<<
+INPUT float MACD_LotSize = 0;                                     // Lot size
+INPUT int MACD_SignalOpenMethod = 0;                              // Signal open method (-15-15)
+INPUT float MACD_SignalOpenLevel = 0.0f;                          // Signal open level
+INPUT int MACD_SignalOpenFilterMethod = 1;                        // Signal open filter method
+INPUT int MACD_SignalOpenBoostMethod = 0;                         // Signal open boost method
+INPUT int MACD_SignalCloseMethod = 0;                             // Signal close method (-15-15)
+INPUT float MACD_SignalCloseLevel = 0.0f;                         // Signal close level
+INPUT int MACD_PriceStopMethod = 0;                               // Price stop method
+INPUT float MACD_PriceStopLevel = 0;                              // Price stop level
+INPUT int MACD_TickFilterMethod = 1;                              // Tick filter method
+INPUT float MACD_MaxSpread = 4.0;                                 // Max spread to trade (pips)
+INPUT int MACD_Shift = 0;                                         // Shift
+INPUT int MACD_OrderCloseTime = -20;                              // Order close time in mins (>0) or bars (<0)
 INPUT string __MACD_Indi_MACD_Parameters__ =
     "-- MACD strategy: MACD indicator params --";                               // >>> MACD strategy: MACD indicator <<<
 INPUT int MACD_Indi_MACD_Period_Fast = 16;                                      // Period Fast
@@ -73,12 +74,12 @@ class Stg_MACD : public Strategy {
     // Initialize strategy initial values.
     MACDParams _indi_params(indi_macd_defaults, _tf);
     StgParams _stg_params(stg_macd_defaults);
-    if (!Terminal::IsOptimization()) {
-      SetParamsByTf<MACDParams>(_indi_params, _tf, indi_macd_m1, indi_macd_m5, indi_macd_m15, indi_macd_m30,
-                                indi_macd_h1, indi_macd_h4, indi_macd_h8);
-      SetParamsByTf<StgParams>(_stg_params, _tf, stg_macd_m1, stg_macd_m5, stg_macd_m15, stg_macd_m30, stg_macd_h1,
-                               stg_macd_h4, stg_macd_h8);
-    }
+#ifdef __config__
+    SetParamsByTf<MACDParams>(_indi_params, _tf, indi_macd_m1, indi_macd_m5, indi_macd_m15, indi_macd_m30, indi_macd_h1,
+                              indi_macd_h4, indi_macd_h8);
+    SetParamsByTf<StgParams>(_stg_params, _tf, stg_macd_m1, stg_macd_m5, stg_macd_m15, stg_macd_m30, stg_macd_h1,
+                             stg_macd_h4, stg_macd_h8);
+#endif
     // Initialize indicator.
     MACDParams macd_params(_indi_params);
     _stg_params.SetIndicator(new Indi_MACD(_indi_params));
@@ -88,7 +89,6 @@ class Stg_MACD : public Strategy {
     _stg_params.SetTf(_tf, _Symbol);
     // Initialize strategy instance.
     Strategy *_strat = new Stg_MACD(_stg_params, "MACD");
-    _stg_params.SetStops(_strat, _strat);
     return _strat;
   }
 
